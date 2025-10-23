@@ -71,7 +71,7 @@ class _CustomLineChartState extends State<CustomLineChart> {
       sideTitles: SideTitles(
         minIncluded: false,
         maxIncluded: false,
-        reservedSize: 50,
+        reservedSize: 40,
         showTitles: true,
 
       )
@@ -82,13 +82,14 @@ class _CustomLineChartState extends State<CustomLineChart> {
     return AxisTitles(
       sideTitles: SideTitles(
         reservedSize: 15,
-        maxIncluded: true,
-        interval:3,
+        maxIncluded: false,
+        minIncluded: true,
+        interval:4,
         getTitlesWidget: (value, meta) {
           var index = value.toInt();
           return  Text(
             dummyIncomeData[index].date,
-            style: const TextStyle(color: Colors.white, fontSize: 10),
+            style: const TextStyle(color: Colors.white, fontSize: 12),
           );
         },
         showTitles: true,

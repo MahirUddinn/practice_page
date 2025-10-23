@@ -49,7 +49,7 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _getTabBar() {
+  _buildTabBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -61,17 +61,17 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _tabItems() {
+  _buildTabItems() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _getTabBar(),
+        _buildTabBar(),
         TopRightDropdown(items: ["Annual", "Quarterly"]),
       ],
     );
   }
 
-  _text() {
+  _buildText() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 5),
       child: Text("Income", style: TextStyle(fontSize: 24)),
@@ -95,14 +95,13 @@ class _IncomeChartState extends State<IncomeChart> {
     return CustomSlider();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _text(),
-        _tabItems(),
+        _buildText(),
+        _buildTabItems(),
         _getChart(),
         _buildSlider(),
         BottomDrawer(),

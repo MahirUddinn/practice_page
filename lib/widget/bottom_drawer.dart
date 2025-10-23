@@ -12,7 +12,7 @@ class _BottomDrawerState extends State<BottomDrawer> {
   Widget _buildNamedBox(String text) {
     return Container(
       height: 50,
-      width: 120,
+      width: 100,
       color: Color(0xFF2D2D2D),
       child: Center(
         child: Text(
@@ -31,7 +31,7 @@ class _BottomDrawerState extends State<BottomDrawer> {
   Widget _buildBox(String text, Color color) {
     return Container(
       height: 50,
-      width: 120,
+      width: 100,
       color: Color(0xFF222222),
       child: Center(
         child: Text(
@@ -62,7 +62,6 @@ class _BottomDrawerState extends State<BottomDrawer> {
                 _buildNamedBox("Previous"),
               ],
             ),
-
             Row(
               children: dummyIncomeData.map((item) {
                 return Column(

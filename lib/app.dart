@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_screen_project/bloc/chart_cubit/chart_cubit.dart';
+import 'package:new_screen_project/bloc/income_chart/income_cubit.dart';
 import 'package:new_screen_project/screen/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,8 +13,11 @@ class App extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.dark,
 
-      home: BlocProvider(
-        create: (context) => ChartCubit(),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => ChartCubit()),
+          BlocProvider(create: (context) => IncomeCubit()),
+        ],
         child: HomeScreen(),
       ),
     );
