@@ -1,11 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:new_screen_project/data/income_data.dart';
+import 'package:new_screen_project/model/income_model.dart';
 
 class CustomLineChart extends StatefulWidget {
-  const CustomLineChart({super.key, required this.data});
+  const CustomLineChart({super.key, required this.incomeData});
 
-  final List<FlSpot> data;
+  final List<IncomeModel> incomeData;
 
   @override
   State<CustomLineChart> createState() => _CustomLineChartState();
@@ -14,20 +15,18 @@ class CustomLineChart extends StatefulWidget {
 class _CustomLineChartState extends State<CustomLineChart> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: LineChart(
-        LineChartData(
-          gridData: _buildGridData(),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            _buildLineChartBarData1(),
-            _buildLineChartBarData2()
-          ],
-          titlesData: _buildTilesData(),
-          minY: -1,
-          maxY: 1
+    return LineChart(
+      LineChartData(
+        gridData: _buildGridData(),
+        borderData: FlBorderData(show: false),
+        lineBarsData: [
+          _buildLineChartBarData1(),
+          _buildLineChartBarData2()
+        ],
+        titlesData: _buildTilesData(),
+        minY: -1,
+        maxY: 1
 
-        ),
       ),
     );
   }
@@ -48,8 +47,8 @@ class _CustomLineChartState extends State<CustomLineChart> {
 
   LineChartBarData _buildLineChartBarData1() {
     return LineChartBarData(
-      spots: dummyIncomeData.asMap().entries
-          .map((e) => FlSpot(e.key.toDouble(), e.value.current))
+      spots: widget.incomeData.asMap().entries
+          .map((data) => FlSpot(data.key.toDouble(), data.value.current))
           .toList(),
       color: Color(0xFF3E62EC),
       aboveBarData: BarAreaData(
@@ -59,8 +58,8 @@ class _CustomLineChartState extends State<CustomLineChart> {
   }
   LineChartBarData _buildLineChartBarData2() {
     return LineChartBarData(
-      spots: dummyIncomeData.asMap().entries
-          .map((e) => FlSpot(e.key.toDouble(), e.value.previous))
+      spots: widget.incomeData.asMap().entries
+          .map((data) => FlSpot(data.key.toDouble(), data.value.previous))
           .toList(),
       color: Color(0xFF656565),
     );
@@ -84,12 +83,13 @@ class _CustomLineChartState extends State<CustomLineChart> {
         reservedSize: 15,
         maxIncluded: false,
         minIncluded: true,
-        interval:4,
+        interval:0.9,
         getTitlesWidget: (value, meta) {
           var index = value.toInt();
+          if (index >= widget.incomeData.length) return Text("");
           return  Text(
-            dummyIncomeData[index].date,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            widget.incomeData[index].date,
+            style: TextStyle(color: Colors.white, fontSize: 11),
           );
         },
         showTitles: true,

@@ -5,9 +5,7 @@ import 'package:new_screen_project/widget/bottom_drawer.dart';
 import 'package:new_screen_project/widget/custom_line_chart.dart';
 import 'package:new_screen_project/widget/custom_slider.dart';
 import 'package:new_screen_project/widget/top_right_dropdown.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:new_screen_project/data/income_data.dart';
-import 'package:collection/collection.dart';
+import 'package:new_screen_project/bloc/income_chart/income_cubit.dart';
 
 class IncomeChart extends StatefulWidget {
   const IncomeChart({super.key});
@@ -78,21 +76,38 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _getChart() {
-    return Container(
-      padding: EdgeInsets.only(right: 10),
-      height: 250,
-      width: double.infinity,
-      child: CustomLineChart(
-        data: dummyIncomeData.mapIndexed((i, x) {
-          return FlSpot(i.toDouble(), x.current);
-        }).toList(),
-      ),
+  _buildChart() {
+    return BlocBuilder<IncomeCubit, IncomeState>(
+      builder: (context, state) {
+        return Container(
+          padding: EdgeInsets.only(right: 10),
+          height: 250,
+          width: double.infinity,
+          child: CustomLineChart(incomeData: state.incomeList),
+        );
+      },
     );
   }
 
   _buildSlider() {
     return CustomSlider();
+  }
+
+  _getInfo(Color color, String text) {
+    return Row(
+      children: [
+        Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color
+          ),
+        ),
+        SizedBox(width: 5,),
+        Text(text)
+      ],
+    );
   }
 
   @override
@@ -102,7 +117,15 @@ class _IncomeChartState extends State<IncomeChart> {
       children: [
         _buildText(),
         _buildTabItems(),
-        _getChart(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _getInfo(Color(0xFF3E62EC), "Current"),
+            SizedBox(width: 15),
+            _getInfo(Color(0xFF636363), "Previous")
+          ],
+        ),
+        _buildChart(),
         _buildSlider(),
         BottomDrawer(),
       ],

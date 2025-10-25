@@ -8,11 +8,27 @@ part 'income_state.dart';
 class IncomeCubit extends Cubit<IncomeState> {
   IncomeCubit()
       : super(IncomeState(
-    incomeList: [],
-    slideValue: 0,
-  ));
+          incomeList: dummyIncomeData.sublist(0, 5),
+          slideValue: 0,
+        )) {
+    updateSlider(0);
+  }
+  final List<IncomeModel> _fullData = dummyIncomeData;
+
 
   void updateSlider(double value) {
-    emit(state.copyWith(slideValue: value));
+    int startIndex = value.toInt();
+    int endIndex = startIndex + 5;
+
+    if (startIndex < 0) startIndex = 0;
+    if (endIndex > _fullData.length) {
+      endIndex = _fullData.length;
+      startIndex = endIndex - 5;
+    }
+
+    emit(state.copyWith(
+      slideValue: value,
+      incomeList: _fullData.sublist(startIndex, endIndex),
+    ));
   }
 }

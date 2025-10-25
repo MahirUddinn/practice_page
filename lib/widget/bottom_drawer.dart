@@ -48,35 +48,37 @@ class _BottomDrawerState extends State<BottomDrawer> {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.hardEdge,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                _buildNamedBox("Quarterly/Annual"),
-                Divider(height: 1, color: Colors.black),
-                _buildNamedBox("Current"),
-                Divider(height: 1, color: Colors.black),
-                _buildNamedBox("Previous"),
-              ],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              _buildNamedBox("Quarterly/Annual"),
+              Divider(height: 1, color: Colors.black),
+              _buildNamedBox("Current"),
+              Divider(height: 1, color: Colors.black),
+              _buildNamedBox("Previous"),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: dummyIncomeData.map((item) {
+                  return Column(
+                    children: [
+                      _buildBox(item.date, Color(0xFFF3F3F3)),
+                      Divider(height: 1, color: Colors.black),
+                      _buildBox(item.current.toString(), Color(0xFFAEAEAE)),
+                      Divider(height: 1, color: Colors.black),
+                      _buildBox(item.previous.toString(), Color(0xFFAEAEAE)),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
-            Row(
-              children: dummyIncomeData.map((item) {
-                return Column(
-                  children: [
-                    _buildBox(item.date, Color(0xFFF3F3F3)),
-                    Divider(height: 1, color: Colors.black),
-                    _buildBox(item.current.toString(), Color(0xFFAEAEAE)),
-                    Divider(height: 1, color: Colors.black),
-                    _buildBox(item.previous.toString(), Color(0xFFAEAEAE)),
-                  ],
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

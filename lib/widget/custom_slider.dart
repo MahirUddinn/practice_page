@@ -11,19 +11,30 @@ class CustomSlider extends StatefulWidget {
 }
 
 class _CustomSliderState extends State<CustomSlider> {
-  double _currentSliderValue = dummyIncomeData.length.toDouble();
-
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      value: _currentSliderValue,
-      activeColor: Color(0xFF3E62EC),
-      thumbColor: Colors.white,
-      max: dummyIncomeData.length.toDouble(),
-      divisions: dummyIncomeData.length,
-      onChanged: (value) {
+    return BlocBuilder<IncomeCubit, IncomeState>(
+      builder: (context, state) {
+        return SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: Color(0xFF3E62EC),
+            inactiveTrackColor: Color(0xFFA8A8A8),
+            overlayColor: Color(0xFF3E62EC),
+            activeTickMarkColor: Colors.transparent,
+            inactiveTickMarkColor: Colors.transparent,
+          ),
+          child: Slider(
 
-        context.read<IncomeCubit>().updateSlider(value);
+            value: state.slideValue,
+            thumbColor: Colors.white,
+            min: 0,
+            max: dummyIncomeData.length.toDouble() - 5,
+            divisions: dummyIncomeData.length - 5,
+            onChanged: (value) {
+              context.read<IncomeCubit>().updateSlider(value);
+            },
+          ),
+        );
       },
     );
   }
