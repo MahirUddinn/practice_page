@@ -14,8 +14,5 @@ class IncomeCubit extends Cubit<IncomeState> {
 
   void updateSlider(double value) {
     emit(state.copyWith(slideValue: value));
-
-
-
   }
 }
