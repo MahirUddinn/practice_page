@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_screen_project/widget/income_chart.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_screen_project/bloc/income_chart/income_cubit.dart';
+import '../widget/income_chart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

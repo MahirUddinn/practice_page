@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:new_screen_project/data/income_data.dart';
 import 'package:new_screen_project/model/income_model.dart';
 
 class CustomLineChart extends StatefulWidget {

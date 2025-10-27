@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:new_screen_project/bloc/chart_cubit/chart_cubit.dart';
-import 'package:new_screen_project/bloc/income_chart/income_cubit.dart';
-import 'package:new_screen_project/screen/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:new_screen_project/presentation/bloc/chart_cubit/chart_cubit.dart';
+import 'package:new_screen_project/presentation/bloc/income_chart/income_cubit.dart';
+import 'package:new_screen_project/presentation/screen/home_screen.dart';
+
 
 class App extends StatelessWidget {
   const App({super.key});

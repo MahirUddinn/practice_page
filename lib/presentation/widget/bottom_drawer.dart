@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:new_screen_project/bloc/income_chart/income_cubit.dart';
 import 'package:new_screen_project/data/income_data.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BottomDrawer extends StatefulWidget {
   final ScrollController scrollController;
