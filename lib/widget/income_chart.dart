@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:new_screen_project/bloc/chart_cubit/chart_cubit.dart';
+import 'package:new_screen_project/data/income_data.dart';
 import 'package:new_screen_project/widget/bottom_drawer.dart';
 import 'package:new_screen_project/widget/custom_line_chart.dart';
 import 'package:new_screen_project/widget/custom_slider.dart';
@@ -15,20 +17,117 @@ class IncomeChart extends StatefulWidget {
 }
 
 class _IncomeChartState extends State<IncomeChart> {
-  _buildTab(String name, int index) {
+  final ScrollController _scrollController = ScrollController();
+
+  static const int _visibleItems = 5;
+
+  int? _lastSpec;
+  bool _isAnimating = false;
+  DateTime _lastUpdate = DateTime.fromMillisecondsSinceEpoch(0);
+  static const int _minUpdateIntervalMs = 40;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isAnimating) return;
+    if (!_scrollController.hasClients) return;
+    final now = DateTime.now();
+    if (now.difference(_lastUpdate).inMilliseconds < _minUpdateIntervalMs) {
+      return;
+    }
+    _lastUpdate = now;
+
+    final maxExtent = _scrollController.position.maxScrollExtent;
+    if (maxExtent <= 0) return;
+
+    final totalMovable = (dummyIncomeData.length - _visibleItems).clamp(0, dummyIncomeData.length).toDouble();
+    if (totalMovable <= 0) return;
+
+    final currentOffset = _scrollController.offset.clamp(0.0, maxExtent);
+    final specDouble = (currentOffset / maxExtent) * totalMovable;
+    final spec = specDouble.round();
+
+    if (_lastSpec != spec) {
+      _lastSpec = spec;
+      context.read<IncomeCubit>().updateSlider(spec.toDouble());
+    }
+  }
+
+  Future<void> _animateToSlide(double slideValue) async {
+    if (!_scrollController.hasClients) return;
+    if (_isAnimating) return;
+
+    final maxExtent = _scrollController.position.maxScrollExtent;
+    if (maxExtent <= 0) return;
+
+    final totalMovable = (dummyIncomeData.length - _visibleItems).clamp(0, dummyIncomeData.length).toDouble();
+    if (totalMovable <= 0) return;
+
+    if (_scrollController.position.isScrollingNotifier.value) return;
+
+    final normalized = (slideValue / totalMovable).isFinite ? (slideValue / totalMovable) : 0.0;
+    double targetOffset = (normalized * maxExtent).clamp(0.0, maxExtent);
+
+    _isAnimating = true;
+    try {
+      await _scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    } finally {
+      _isAnimating = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(padding: const EdgeInsets.all(8), child: _buildText()),
+        Container(padding: const EdgeInsets.all(8), child: _buildTabItems()),
+        _buildLegend(),
+        _buildChart(),
+        _buildSlider(),
+        Container(
+          padding: EdgeInsets.all(8),
+          child: BlocListener<IncomeCubit, IncomeState>(
+            listenWhen: (previous, current) => previous.slideValue != current.slideValue,
+            listener: (context, state) {
+              _animateToSlide(state.slideValue);
+            },
+            child: BottomDrawer(scrollController: _scrollController),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTab(String name, int index) {
     return GestureDetector(
       onTap: () {
         context.read<ChartCubit>().setIndex(index);
       },
       child: BlocBuilder<ChartCubit, ChartState>(
         builder: (context, state) {
+          final selected = state.chartIndex == index;
           return Container(
-            margin: EdgeInsets.all(2),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+            margin: const EdgeInsets.all(2),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
             decoration: BoxDecoration(
-              color: state.chartIndex == index
-                  ? Color(0xFF161825)
-                  : Color(0xFF202020),
+              color: selected ? const Color(0xFF161825) : const Color(0xFF202020),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Text(
@@ -36,9 +135,7 @@ class _IncomeChartState extends State<IncomeChart> {
               style: TextStyle(
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
-                color: state.chartIndex == index
-                    ? Color(0xFF5C70B9)
-                    : Color(0xFF969696),
+                color: selected ? const Color(0xFF5C70B9) : const Color(0xFF969696),
               ),
             ),
           );
@@ -47,7 +144,7 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _buildTabBar() {
+  Widget _buildTabBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -59,28 +156,28 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _buildTabItems() {
+  Widget _buildTabItems() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildTabBar(),
-        TopRightDropdown(items: ["Annual", "Quarterly"]),
+        const TopRightDropdown(items: ["Annual", "Quarterly"]),
       ],
     );
   }
 
-  _buildText() {
+  Widget _buildText() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5),
-      child: Text("Income", style: TextStyle(fontSize: 24)),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      child: const Text("Income", style: TextStyle(fontSize: 24)),
     );
   }
 
-  _buildChart() {
+  Widget _buildChart() {
     return BlocBuilder<IncomeCubit, IncomeState>(
       builder: (context, state) {
         return Container(
-          padding: EdgeInsets.only(right: 10),
+          padding: const EdgeInsets.only(right: 10),
           height: 250,
           width: double.infinity,
           child: CustomLineChart(incomeData: state.incomeList),
@@ -89,45 +186,31 @@ class _IncomeChartState extends State<IncomeChart> {
     );
   }
 
-  _buildSlider() {
-    return CustomSlider();
+  Widget _buildSlider() {
+    return CustomSlider(onChange: context.read<IncomeCubit>().updateSlider);
   }
 
-  _getInfo(Color color, String text) {
+  Widget _getLegend(Color color, String text) {
     return Row(
       children: [
         Container(
           height: 10,
           width: 10,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color
-          ),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
-        SizedBox(width: 5,),
-        Text(text)
+        const SizedBox(width: 5),
+        Text(text),
       ],
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildLegend() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildText(),
-        _buildTabItems(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _getInfo(Color(0xFF3E62EC), "Current"),
-            SizedBox(width: 15),
-            _getInfo(Color(0xFF636363), "Previous")
-          ],
-        ),
-        _buildChart(),
-        _buildSlider(),
-        BottomDrawer(),
+        _getLegend(const Color(0xFF3E62EC), "Current"),
+        const SizedBox(width: 15),
+        _getLegend(const Color(0xFF636363), "Previous"),
       ],
     );
   }

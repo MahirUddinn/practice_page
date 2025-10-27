@@ -19,10 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IncomeChart(),
-            ),
+            child: IncomeChart(),
           )
         ],
       ),
